@@ -1,0 +1,14 @@
+name: ${project.artifactId}
+main: ${project.groupId}.${project.artifactId}.${project.artifactId}
+version: ${project.version}
+author: khjxiaogu
+depend: [PowerNBT]
+commands:
+  wskill:
+    description: 武器技能插件指令
+    permission: ${project.artifactId}.admin
+    usage: 输入/wskill获得帮助
+permissions:
+  ${project.artifactId}.admin:
+    description: 武器技能插件的权限
+    default: op
