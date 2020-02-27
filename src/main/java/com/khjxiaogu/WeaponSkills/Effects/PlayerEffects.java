@@ -21,6 +21,12 @@ public class PlayerEffects {
 	public void giveEffect(EffectFactory effect,int time,int level) {
 		effects.put(effect,effect.createEffectInstance(owner, time, level));
 	}
+	public boolean hasEffect(EffectFactory effect) {
+		return effects.containsKey(effect);
+	}
+	public EffectInstance getEffect(EffectFactory effect) {
+		return effects.get(effect);
+	}
 	public void tickEffects() {
 		if(effects.isEmpty())return;
 		long time=TimeUtil.getTime();

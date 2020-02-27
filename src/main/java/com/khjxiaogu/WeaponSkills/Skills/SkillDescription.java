@@ -11,10 +11,29 @@ public class SkillDescription {
 	String name;
 	Skill skill;
 	int level;
+	/**
+	 * 为输出使用
+	 * for output
+	 * @param n skill name
+	 * @param s skill instance
+	 * @param l level
+	 */
 	public SkillDescription(String n,Skill s,int l) {
 		name=n;
 		level=l;
 		skill=s;
+		// TODO Auto-generated constructor stub
+	}
+	/**
+	 * 为给物品设置技能使用
+	 * for setting skill for item
+	 * @param n 技能名字 skill name
+	 * @param l 技能等级 skill level
+	 */
+	public SkillDescription(String n,int l) {
+		name=n;
+		level=l;
+		skill=null;
 		// TODO Auto-generated constructor stub
 	}
 	/**
@@ -40,5 +59,15 @@ public class SkillDescription {
 	 */
 	public Skill getSkill() {
 		return skill;
+	}
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+	@Override
+	public boolean equals(Object another) {
+		if(another==this)return true;
+		if(!(another instanceof SkillDescription))return false;
+		return name.equals(((SkillDescription)another).name);
 	}
 }

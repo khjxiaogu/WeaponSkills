@@ -1,5 +1,6 @@
 package com.khjxiaogu.WeaponSkills;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,9 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.khjxiaogu.WeaponSkills.Effects.EffectFactory;
+import com.khjxiaogu.WeaponSkills.Effects.EffectInstance;
 import com.khjxiaogu.WeaponSkills.Effects.PlayerEffects;
 import com.khjxiaogu.WeaponSkills.Skills.Skill;
 import com.khjxiaogu.WeaponSkills.Skills.SkillDescription;
+import com.khjxiaogu.WeaponSkills.Skills.SkillHook;
 import com.khjxiaogu.WeaponSkills.Skills.SkillInstance;
 
 import me.dpohvar.powernbt.api.NBTCompound;
@@ -32,7 +35,7 @@ public class SkillEffectManager implements Listener {
 	private Map<Player, PlayerEffects> playereffect = new ConcurrentHashMap<>();
 	private Map<String, Skill> skills = new ConcurrentHashMap<>();
 	private NBTManager nm = NBTManager.getInstance();
-
+	private Map<String, SkillHook> skillhooks = new ConcurrentHashMap<>();
 	private SkillEffectManager() {
 		new BukkitRunnable() {
 			@Override
@@ -46,7 +49,12 @@ public class SkillEffectManager implements Listener {
 		}.runTaskTimerAsynchronously(WeaponSkills.plugin, 100, 5);
 		// TODO Auto-generated constructor stub
 	}
-
+	public Skill getSkillByName(String s) {
+		return skills.get(s);
+	}
+	public EffectFactory getEffectByName(String s) {
+		return effects.get(s);
+	}
 	public boolean giveEffect(Player p, String name, int time, int level) {
 		PlayerEffects current = playereffect.get(p);
 		if (current == null) {
@@ -76,33 +84,98 @@ public class SkillEffectManager implements Listener {
 		}
 		return true;
 	}
-
-	public void writeSkill(ItemStack item, String skill, int level) {
+	public EffectInstance getEffect(Player p,EffectFactory effect) {
+		PlayerEffects current = playereffect.get(p);
+		if (current != null) {
+			return current.getEffect(effect);
+		}
+		return null;
+	}
+	public EffectInstance getEffect(Player p,String name) {
+		PlayerEffects current = playereffect.get(p);
+		EffectFactory e = effects.get(name);
+		if (e == null)
+			return null;
+		if (current != null) {
+			return current.getEffect(e);
+		}
+		return null;
+	}
+	public boolean hasEffect(Player p,EffectFactory effect) {
+		PlayerEffects current = playereffect.get(p);
+		if (current != null) {
+			return current.hasEffect(effect);
+		}
+		return false;
+	}
+	public boolean hasEffect(Player p,String name) {
+		PlayerEffects current = playereffect.get(p);
+		EffectFactory e = effects.get(name);
+		if (e == null)
+			return false;
+		if (current != null) {
+			return current.hasEffect(e);
+		}
+		return false;
+	}
+	public void writeSkill(ItemStack item,Set<SkillDescription> skills) {
 		NBTCompound nbt = nm.read(item);
 		if (nbt == null)
 			nbt = new NBTCompound();
 		NBTCompound pnbt = nbt.getCompound("SkillEffects");
 		if (pnbt == null)
 			pnbt = new NBTCompound();
-		pnbt.put("Skill", skill);
-		pnbt.put("Skilllevel", level);
+		String skillstr="";
+		String levelstr="";
+		for(SkillDescription skill:skills) {
+			skillstr+=skill.getName();
+			levelstr+=skill.getLevel();
+			skillstr+=",";
+			levelstr+=",";
+		}
+		pnbt.put("Skill",skillstr);
+		pnbt.put("Skilllevel",levelstr);
 		nbt.put("SkillEffects", pnbt);
 		nm.write(item, nbt);
-
 	}
-
-	public SkillDescription readSkill(ItemStack item) {
+	public void RegisterSkillHook(String name,SkillHook hook) {
+		skillhooks.put(name,hook);
+	}
+	public void UnregisterSkillHook(String name) {
+		skillhooks.remove(name);
+	}
+	public Set<SkillDescription> readSkill(ItemStack item) {
+		Set<SkillDescription> ret=new HashSet<>();
 		NBTCompound nbt = nm.read(item);
 		if (nbt == null)
-			return null;
+			return ret;
 		NBTCompound pnbt = nbt.getCompound("SkillEffects");
 		if (pnbt == null)
-			return null;
+			return ret;
 		String Skills = pnbt.getString("Skill");
-		int level = pnbt.getInt("Skilllevel");
-		return new SkillDescription(Skills, skills.get(Skills), level);
+		String levels = pnbt.getString("Skilllevel");
+		String[] sks=Skills.split(",");
+		String[] lvs=levels.split(",");
+		
+		for(int i=0;i<sks.length;i++) {
+			ret.add(new SkillDescription(sks[i], skills.get(sks[i]),Integer.parseInt(lvs[i])));
+		}
+		return ret;
 	}
-
+	public SkillInstance getHookedSkills(Player p) {
+		Set<SkillDescription> skills=new HashSet<>();
+		for(SkillHook hook:skillhooks.values()) {
+			try {
+				skills.addAll(hook.getSkill(p));
+			}catch(Exception e) {
+				try {
+					WeaponSkills.plugin.getLogger().warning("从"+hook.getName()+"载入技能失败!");
+				}catch(Exception f) {}
+				e.printStackTrace();
+			}
+		}
+		return new SkillInstance(skills);
+	}
 	public SkillInstance getSkillInstance(ItemStack item) {
 		if (item == null || item.getType() == Material.AIR)
 			return null;
@@ -113,11 +186,16 @@ public class SkillEffectManager implements Listener {
 		if (pnbt == null)
 			return null;
 		String Skills = pnbt.getString("Skill");
-		int level = pnbt.getInt("Skilllevel");
-		Skill current = skills.get(Skills);
-		if (current == null)
-			return null;
-		return new SkillInstance(current, level);
+		String levels = pnbt.getString("Skilllevel");
+		String[] sks=Skills.split(",");
+		String[] lvs=levels.split(",");
+		Skill[] skns=new Skill[sks.length];
+		int[] lvns=new int[sks.length];
+		for(int i=0;i<sks.length;i++) {
+			skns[i]=skills.get(sks[i]);
+			lvns[i]=Integer.parseInt(lvs[i]);
+		}
+		return new SkillInstance(skns,lvns);
 	}
 
 	public void removeSkill(ItemStack item) {
@@ -130,42 +208,18 @@ public class SkillEffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	private void onInteractEntity(PlayerInteractEntityEvent ev) {
-		ItemStack hand = ev.getPlayer().getItemInHand();
-		if (hand == null || hand.getType() == Material.AIR)
-			return;
-		NBTCompound nbt = nm.read(hand);
-		if (nbt == null)
-			return;
-		NBTCompound pnbt = nbt.getCompound("SkillEffects");
-		if (pnbt == null)
-			return;
-		String Skills = pnbt.getString("Skill");
-		int level = pnbt.getInt("Skilllevel");
-		if (Skills == null)
-			return;
-		Skill current = skills.get(Skills);
-		if (current == null)
-			return;
-		current.onRightClickEntity(ev, level);
+		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
+		if(handSkills!=null)
+			handSkills.onRightClickEntity(ev);
+		getHookedSkills(ev.getPlayer()).onRightClickEntity(ev);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	private void onInteractBlock(PlayerInteractEvent ev) {
-		ItemStack hand = ev.getPlayer().getItemInHand();
-		if (hand == null || hand.getType() == Material.AIR)
-			return;
-		NBTCompound nbt = nm.read(hand);
-		if (nbt == null)
-			return;
-		NBTCompound pnbt = nbt.getCompound("SkillEffects");
-		if (pnbt == null)
-			return;
-		String Skills = pnbt.getString("Skill");
-		int level = pnbt.getInt("Skilllevel");
-		Skill current = skills.get(Skills);
-		if (current == null)
-			return;
-		current.onRightClickBlock(ev, level);
+		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
+		if(handSkills!=null)
+			handSkills.onRightClickBlock(ev);
+		getHookedSkills(ev.getPlayer()).onRightClickBlock(ev);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -182,6 +236,7 @@ public class SkillEffectManager implements Listener {
 		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
 		if (handSkill != null)
 			handSkill.onDoDamage(ev);
+		getHookedSkills(p).onDoDamage(ev);
 		// execute skill in armor
 		for (ItemStack item : p.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
@@ -200,6 +255,7 @@ public class SkillEffectManager implements Listener {
 		SkillInstance weaponSkill = this.getSkillInstance(p2.getItemInHand());
 		if (weaponSkill != null)
 			weaponSkill.onBeDamageByEntity(ev);
+		getHookedSkills(p2).onBeDamageByEntity(ev);
 		// execute skill in armor
 		for (ItemStack item : p2.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
@@ -219,6 +275,7 @@ public class SkillEffectManager implements Listener {
 		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
 		if (handSkill != null)
 			handSkill.onBeDamaged(ev);
+		getHookedSkills(p).onBeDamaged(ev);
 		for (ItemStack item : p.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
 			if (armorSkill != null)

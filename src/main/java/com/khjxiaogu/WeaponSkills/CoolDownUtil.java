@@ -9,7 +9,7 @@ import com.khjxiaogu.khjxiaogu.TimeUtil;
 
 public class CoolDownUtil {
 	private static Map<Player,PlayerCoolDown> cooldownmap=new ConcurrentHashMap<>();
-	public static boolean applyCoolDown(Player p,String reason,int milli) {
+	public static long applyCoolDown(Player p,String reason,int milli) {
 		PlayerCoolDown pcd=cooldownmap.get(p);
 		if(pcd==null) {
 			pcd=new PlayerCoolDown();
@@ -46,13 +46,13 @@ public class CoolDownUtil {
 class PlayerCoolDown{
 	private Map<String,Long> CoolDowns=new ConcurrentHashMap<>();
 	PlayerCoolDown(){}
-	public boolean applyCoolDown(String reason,int milli) {
+	public long applyCoolDown(String reason,int milli) {
 		long current=TimeUtil.getTime();
 		Long l=CoolDowns.get(reason);
 		if(l!=null&&l>current) 
-			return false;
+			return l-current;
 		CoolDowns.put(reason,current+milli);
-		return true;
+		return 0;
 	};
 	public boolean isCoolDown(String reason) {
 		Long l=CoolDowns.get(reason);

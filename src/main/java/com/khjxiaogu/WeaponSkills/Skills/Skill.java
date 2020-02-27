@@ -47,4 +47,10 @@ public interface Skill {
 	 * @return 效果名字 name of this skill
 	 */
 	public String getName();
+	/**
+	 * 获取该技能的优先级，默认0
+	 * returns name of this skill,must be unique
+	 * @return 效果名字 name of this skill
+	 */
+	public int getPriority();
 }

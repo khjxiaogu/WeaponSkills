@@ -8,8 +8,11 @@ import org.bukkit.inventory.ItemStack;
 import com.khjxiaogu.WeaponSkills.CoolDownUtil;
 import com.khjxiaogu.WeaponSkills.SkillEffectManager;
 import com.khjxiaogu.WeaponSkills.Effects.EffectFactory;
+import com.khjxiaogu.WeaponSkills.Effects.EffectInstance;
+import com.khjxiaogu.WeaponSkills.Effects.PlayerEffects;
 import com.khjxiaogu.WeaponSkills.Skills.Skill;
 import com.khjxiaogu.WeaponSkills.Skills.SkillDescription;
+import com.khjxiaogu.WeaponSkills.Skills.SkillHook;
 
 public class WeaponSkillAPI {
 	private SkillEffectManager manager;
@@ -55,32 +58,43 @@ public class WeaponSkillAPI {
 	public void giveEffect(EffectFactory effect, Player p, int time, int level) {
 		manager.giveEffect(p, effect, time, level);
 	}
-
+	public EffectInstance getEffect(Player p,EffectFactory effect) {
+		return manager.getEffect(p, effect);
+	}
+	public EffectInstance getEffect(Player p,String name) {
+		return manager.getEffect(p,name);
+	}
+	public boolean hasEffect(Player p,EffectFactory effect) {
+		return manager.hasEffect(p, effect);
+	}
+	public boolean hasEffect(Player p,String name) {
+		return manager.hasEffect(p, name);
+	}
 	/**
-	 * 给一个物品写入一个技能
-	 * writes an skill to an item
+	 * 给一个物品写入一个技能，无需写入SkillDescription的skill项，只需填写name和level即可
+	 * writes skills to an item
+	 * SkillDescription's skill field is not necessary,for it only check the name and level.
 	 * @param item 目标物品 target item
-	 * @param name 技能名字 skill name
-	 * @param level 技能等级
+	 * @param skills 技能集合 Set of skills
 	 * 
 	 */
-	public void writeSkill(ItemStack item, String name, int level) {
-		manager.writeSkill(item, name, level);
+	public void writeSkills(ItemStack item, Set<SkillDescription> skills) {
+		manager.writeSkill(item,skills);
 	}
 
 	/**
 	 * 读取一个物品的技能
-	 * get the skill of an item
+	 * get skills of an item
 	 * @param item 要读取的物品 target item
-	 * @return 技能描述对象，如果物品没有技能则为null SkillDescription object contains the info,null if no skill is presented on this item
+	 * @return 技能描述对象集合，如果物品没有技能则为null Set of SkillDescription object contains the info,null if no skill is presented on this item
 	 */
-	public SkillDescription readSkill(ItemStack item) {
+	public Set<SkillDescription> readSkill(ItemStack item) {
 		return manager.readSkill(item);
 	}
 
 	/**
 	 * 移除对应物品的技能
-	 * remove skill on an item
+	 * remove all skills on an item
 	 * @param item 目标物品 target item
 	 */
 	public void removeSkill(ItemStack item) {
@@ -142,7 +156,24 @@ public class WeaponSkillAPI {
 	public Skill removeSkill(String name) {
 		return manager.undefineSkill(name);
 	}
-
+	public Skill getSkill(String name) {
+		return manager.getSkillByName(name);
+	}
+	public EffectFactory getEffect(String name) {
+		return manager.getEffectByName(name);
+	}
+	public void RegisterSkillHook(SkillHook hook) {
+		manager.RegisterSkillHook(hook.getName(), hook);
+	}
+	public void RegisterSkillHook(String name,SkillHook hook) {
+		manager.RegisterSkillHook(name, hook);
+	}
+	public void UnRegisterSkillHook(SkillHook hook) {
+		manager.UnregisterSkillHook(hook.getName());
+	}
+	public void UnRegisterSkillHook(String name) {
+		manager.UnregisterSkillHook(name);
+	}
 	/**
 	 * 获取效果m名称列表 get all registered effects
 	 * @return a set of identifier of registered effects
@@ -166,9 +197,9 @@ public class WeaponSkillAPI {
 	 * @param p 目标玩家 target player
 	 * @param skill 冷却的技能 skill to cool down
 	 * @param milliSecond 冷却时间ms cool down time in milliseconds
-	 * @return 如果玩家不在冷却时间内，返回true，如果玩家正在冷却中，返回false return true if target player is not in cool down,otherwise return false
+	 * @return 如果玩家不在冷却时间内，返回0，如果玩家正在冷却中，返回剩余时间ms return 0 if target player is not in cool down,otherwise return time rest
 	 */
-	public boolean applyCoolDown(Player p, Skill skill, int milliSecond) {
+	public long applyCoolDown(Player p, Skill skill, int milliSecond) {
 		return CoolDownUtil.applyCoolDown(p, skill.getName(), milliSecond);
 	}
 
@@ -179,7 +210,7 @@ public class WeaponSkillAPI {
 	 * @param skill 技能 target skill
 	 * @return 玩家是否在冷却时间内 if a player is in cool down.
 	 */
-	public static boolean isCoolDown(Player p, Skill skill) {
+	public boolean isCoolDown(Player p, Skill skill) {
 		return CoolDownUtil.isCoolDown(p, skill.getName());
 	}
 
@@ -189,7 +220,7 @@ public class WeaponSkillAPI {
 	 * @param p 玩家 target player
 	 * @param skill 技能 target skill
 	 */
-	public static void resetCoolDown(Player p, Skill skill) {
+	public void resetCoolDown(Player p, Skill skill) {
 		CoolDownUtil.resetCoolDown(p, skill.getName());
 	}
 
@@ -200,7 +231,7 @@ public class WeaponSkillAPI {
 	 * @param skill 技能 skill to renew.
 	 * @param milliSecond 冷却时间 new cool down time
 	 */
-	public static void renewCoolDown(Player p, Skill skill, int milliSecond) {
+	public void renewCoolDown(Player p, Skill skill, int milliSecond) {
 		CoolDownUtil.renewCoolDown(p, skill.getName(), milliSecond);
 	}
 }
