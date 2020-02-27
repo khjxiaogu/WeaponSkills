@@ -11,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.khjxiaogu.WeaponSkills.Skills.SkillDescription;
+import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
 import com.khjxiaogu.khjxiaogu.KHJUtils;
 import com.khjxiaogu.khjxiaogu.TimeUtil;
 

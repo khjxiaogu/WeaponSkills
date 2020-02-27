@@ -1,4 +1,4 @@
-package com.khjxiaogu.WeaponSkills.Effects;
+package com.khjxiaogu.WeaponSkills.effect;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

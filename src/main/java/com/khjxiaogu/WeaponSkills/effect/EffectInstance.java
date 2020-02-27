@@ -1,4 +1,4 @@
-package com.khjxiaogu.WeaponSkills.Effects;
+package com.khjxiaogu.WeaponSkills.effect;
 
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;

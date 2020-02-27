@@ -1,4 +1,4 @@
-package com.khjxiaogu.WeaponSkills.Skills;
+package com.khjxiaogu.WeaponSkills.skill;
 
 import java.util.Set;
 

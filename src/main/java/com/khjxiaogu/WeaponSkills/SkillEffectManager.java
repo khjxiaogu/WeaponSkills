@@ -18,13 +18,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.khjxiaogu.WeaponSkills.Effects.EffectFactory;
-import com.khjxiaogu.WeaponSkills.Effects.EffectInstance;
-import com.khjxiaogu.WeaponSkills.Effects.PlayerEffects;
-import com.khjxiaogu.WeaponSkills.Skills.Skill;
-import com.khjxiaogu.WeaponSkills.Skills.SkillDescription;
-import com.khjxiaogu.WeaponSkills.Skills.SkillHook;
-import com.khjxiaogu.WeaponSkills.Skills.SkillInstance;
+import com.khjxiaogu.WeaponSkills.effect.EffectFactory;
+import com.khjxiaogu.WeaponSkills.effect.EffectInstance;
+import com.khjxiaogu.WeaponSkills.effect.PlayerEffects;
+import com.khjxiaogu.WeaponSkills.skill.Skill;
+import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
+import com.khjxiaogu.WeaponSkills.skill.SkillHook;
+import com.khjxiaogu.WeaponSkills.skill.SkillInstance;
 
 import me.dpohvar.powernbt.api.NBTCompound;
 import me.dpohvar.powernbt.api.NBTManager;

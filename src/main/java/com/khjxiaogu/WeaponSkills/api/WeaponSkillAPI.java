@@ -7,12 +7,12 @@ import org.bukkit.inventory.ItemStack;
 
 import com.khjxiaogu.WeaponSkills.CoolDownUtil;
 import com.khjxiaogu.WeaponSkills.SkillEffectManager;
-import com.khjxiaogu.WeaponSkills.Effects.EffectFactory;
-import com.khjxiaogu.WeaponSkills.Effects.EffectInstance;
-import com.khjxiaogu.WeaponSkills.Effects.PlayerEffects;
-import com.khjxiaogu.WeaponSkills.Skills.Skill;
-import com.khjxiaogu.WeaponSkills.Skills.SkillDescription;
-import com.khjxiaogu.WeaponSkills.Skills.SkillHook;
+import com.khjxiaogu.WeaponSkills.effect.EffectFactory;
+import com.khjxiaogu.WeaponSkills.effect.EffectInstance;
+import com.khjxiaogu.WeaponSkills.effect.PlayerEffects;
+import com.khjxiaogu.WeaponSkills.skill.Skill;
+import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
+import com.khjxiaogu.WeaponSkills.skill.SkillHook;
 
 public class WeaponSkillAPI {
 	private SkillEffectManager manager;
