@@ -65,7 +65,7 @@ public class SkillEffectManager implements Listener {
 		if (e != null)
 			current.giveEffect(e, time, level);
 		else {
-			WeaponSkills.plugin.getLogger().warning("技能" + name + "不存在！");
+			WeaponSkills.plugin.getLogger().warning(name +WeaponSkills.plugin.locale.getEffectInvalid());
 			return false;
 		}
 		return true;

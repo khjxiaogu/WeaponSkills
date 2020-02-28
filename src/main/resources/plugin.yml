@@ -7,7 +7,7 @@ commands:
   wskill:
     description: 武器技能插件指令
     permission: ${project.artifactId}.admin
-    usage: 输入/wskill获得帮助
+    usage: /wskill
 permissions:
   ${project.artifactId}.admin:
     description: 武器技能插件的权限

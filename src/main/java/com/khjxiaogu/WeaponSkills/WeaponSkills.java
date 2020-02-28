@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.khjxiaogu.WeaponSkills.localization.*;
 import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
 import com.khjxiaogu.khjxiaogu.KHJUtils;
 import com.khjxiaogu.khjxiaogu.TimeUtil;
@@ -18,10 +19,16 @@ import com.khjxiaogu.khjxiaogu.TimeUtil;
 public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener {
 	public static WeaponSkills plugin;
 	private static SkillEffectManager manager;
+	LocalizationProvider locale;
 	@Override
 	public void onEnable() {
 		plugin=this;
 		manager=SkillEffectManager.getManager();
+		this.saveDefaultConfig();
+		switch(this.getConfig().getString("lang").toLowerCase()) {
+		case "cn":locale=new CN();break;
+		case "en":locale=new EN();break;
+		}
 		KHJUtils.SendPluginInfo(WeaponSkills.plugin);
     	TimeUtil.setPlugin(this);
     	Bukkit.getPluginManager().registerEvents(manager,this);
@@ -29,21 +36,17 @@ public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener
 	@Override
 	public boolean onCommand(CommandSender sender,Command command, String s, String[] strings) {
 		if(strings.length==0){
-			sender.sendMessage("§e武器技能插件插件  By khjxiaogu");
-			sender.sendMessage("§e输入/wskill set [技能名称] [技能等级|0] 设置手中物品技能，等级为0即移除");
-			sender.sendMessage("§e输入/wskill clear 删除手中物品所有技能");
-			sender.sendMessage("§e输入/wskill read 读取手中物品技能");
-			sender.sendMessage("§e输入/wskill effect <玩家> <效果名称> <效果等级> <效果持续时间ms> 给玩家一个插件效果");
-			sender.sendMessage("§e输入/wskill list <skill/effect> 查看技能/效果列表");
+			sender.sendMessage(locale.getHelp());
 			return true;
-		}else if(sender instanceof Player) {
+		}
+		if(sender instanceof Player) {
 			Player p=(Player) sender;
 			if(strings[0].equals("set")) {
 				ItemStack is=p.getItemInHand();
 				if(strings.length<2) {
 					manager.removeSkill(is);
 					p.setItemInHand(is);
-					p.sendMessage("§e技能已经清除！");
+					p.sendMessage(locale.getSkillCleared());
 				}else if(strings.length==2) {
 					Set<SkillDescription> descs=manager.readSkill(is);
 					SkillDescription current=new SkillDescription(strings[1],1);
@@ -51,7 +54,7 @@ public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener
 					descs.add(current);
 					manager.writeSkill(is,descs);
 					p.setItemInHand(is);
-					p.sendMessage("§e技能已经写入！");
+					p.sendMessage(locale.getSkillWritten());
 				}else {
 					int lvl=Integer.parseInt(strings[2]);
 					Set<SkillDescription> descs=manager.readSkill(is);
@@ -61,63 +64,63 @@ public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener
 						descs.add(current);
 						manager.writeSkill(is,descs);
 						p.setItemInHand(is);
-						p.sendMessage("§e技能已经写入！");
+						p.sendMessage(locale.getSkillWritten());
 					}else {
 						SkillDescription current=new SkillDescription(strings[1],0);
 						descs.remove(current);
 						manager.writeSkill(is,descs);
 						p.setItemInHand(is);
-						p.sendMessage("§e技能已经移除！");
+						p.sendMessage(locale.getSkillRemoved());
 					}
 				}
 				return true;
 			}else if(strings[0].equals("clear")) {
 				ItemStack is=p.getItemInHand();
 				manager.removeSkill(is);
-				p.sendMessage("§e技能已全部移除");
+				p.sendMessage(locale.getSkillCleared());
 				return true;
 			}else if(strings[0].equals("read")) {
 				ItemStack is=p.getItemInHand();
 				Set<SkillDescription> skills=manager.readSkill(is);
 				if(skills==null) {
-					p.sendMessage("§4该物品查无信息！");
+					p.sendMessage(locale.getNoSkill());
 					return true;
 				}
-				p.sendMessage("§e手中物品技能：");
+				p.sendMessage(locale.getSkillInHand());
 				for(SkillDescription skill:skills)
-					p.sendMessage(" §3"+skill.getName()+"[lv."+skill.getLevel()+(skill.getSkill()==null?"] §4技能无效！":"] §a技能有效！"));
+					p.sendMessage(" §3"+skill.getName()+"[lv."+skill.getLevel()+"] "+(skill.getSkill()==null? locale.getInvalidSkill():locale.getIsvalidSkill()));
 				return true;
 			}else if(strings[0].equals("effect")) {
 				if(strings.length>=5) {
 					if(manager.giveEffect(Bukkit.getPlayer(strings[1]),strings[2],Integer.parseInt(strings[4]),Integer.parseInt(strings[3]))) {
-						p.sendMessage("§e效果给予成功！");
+						p.sendMessage(locale.getEffectGiven());
 					}else {
-						p.sendMessage("§4效果不存在！");
+						p.sendMessage(locale.getEffectInvalid());
 					}
 					return true;
-				}else {
-					p.sendMessage("§4参数不足");
-					return false;
 				}
+					p.sendMessage(locale.getBadParamCount());
+					return false;
 			}
-		}else if(strings[0].equals("list")) {
+		}
+		if(strings[0].equals("list")) {
 			if(strings.length>1) {
 				if(strings[1].equals("effect")) {
-					sender.sendMessage("§e效果列表：");
+					sender.sendMessage(locale.getListOfEffect());
 					for(String name:manager.getEffectList()) {
 						sender.sendMessage("§e  "+name);
 					}
 				}else if(strings[1].equals("skill")){
-					sender.sendMessage("§e技能列表：");
+					sender.sendMessage(locale.getListOfSkill());
 					for(String name:manager.getSkillList()) {
 						sender.sendMessage("§e  "+name);
 					}
 				}else {
-					sender.sendMessage("§4参数有误");
+					sender.sendMessage(locale.getInvalidParam());
 					return false;
 				}
 			}else {
-				sender.sendMessage("§4参数不足");
+				sender.sendMessage(locale.getBadParamCount());
 				return false;
 			}
 			return true;
