@@ -5,12 +5,12 @@ public class EN implements LocalizationProvider {
 	public EN() {
 		// TODO Auto-generated constructor stub
 		help=new String[6];
-		help[0]=("§eWeaponSkills Plugin  By khjxiaogu");
-		help[1]=("§euse/wskill set [skillname] [level|0]§f to add or modify a skill on the item in your hand,set level to 0 means removal.");
-		help[2]=("§euse/wskill clear§f to clear all skills on the item in your hand");
-		help[3]=("§euse/wskill read§f to read the list of skill on the item in your hand");
-		help[4]=("§euse/wskill effect <playername> <effectname> <level> <duration/ms>§f to give player a plugin effect");
-		help[5]=("§euse/wskill list <skill/effect>§f to list all skills or effects");
+		help[0]=(Messages.getString("EN.0")); //$NON-NLS-1$
+		help[1]=(Messages.getString("EN.1")); //$NON-NLS-1$
+		help[2]=(Messages.getString("EN.2")); //$NON-NLS-1$
+		help[3]=(Messages.getString("EN.3")); //$NON-NLS-1$
+		help[4]=(Messages.getString("EN.4")); //$NON-NLS-1$
+		help[5]=(Messages.getString("EN.5")); //$NON-NLS-1$
 		// TODO Auto-generated constructor stub
 	}
 
@@ -23,79 +23,79 @@ public class EN implements LocalizationProvider {
 	@Override
 	public String getSkillCleared() {
 		// TODO Auto-generated method stub
-		return "§eall skills has been removed";
+		return Messages.getString("EN.6"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getSkillWritten() {
 		// TODO Auto-generated method stub
-		return "§eskill has been written";
+		return Messages.getString("EN.7"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getSkillRemoved() {
 		// TODO Auto-generated method stub
-		return "§eskill has been removed";
+		return Messages.getString("EN.8"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getNoSkill() {
 		// TODO Auto-generated method stub
-		return "§eno skill has been bind to this item.";
+		return Messages.getString("EN.9"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getSkillInHand() {
 		// TODO Auto-generated method stub
-		return "§elist of skills in hand";
+		return Messages.getString("EN.10"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getInvalidSkill() {
 		// TODO Auto-generated method stub
-		return "§4Skill Invalid";
+		return Messages.getString("EN.11"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getIsvalidSkill() {
 		// TODO Auto-generated method stub
-		return "§aSkill Valid";
+		return Messages.getString("EN.12"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getEffectGiven() {
 		// TODO Auto-generated method stub
-		return "§eeffect given";
+		return Messages.getString("EN.13"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getEffectInvalid() {
 		// TODO Auto-generated method stub
-		return "§4Effect Invalid";
+		return Messages.getString("EN.14"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getBadParamCount() {
 		// TODO Auto-generated method stub
-		return "§4Bad param count";
+		return Messages.getString("EN.15"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getInvalidParam() {
 		// TODO Auto-generated method stub
-		return "§4Invalid param";
+		return Messages.getString("EN.16"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getListOfSkill() {
 		// TODO Auto-generated method stub
-		return "§4List of all skills";
+		return Messages.getString("EN.17"); //$NON-NLS-1$
 	}
 
 	@Override
 	public String getListOfEffect() {
 		// TODO Auto-generated method stub
-		return "§4List of all effects";
+		return Messages.getString("EN.18"); //$NON-NLS-1$
 	}
 
 }
