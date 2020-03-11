@@ -206,7 +206,7 @@ public class SkillEffectManager implements Listener {
 		nm.write(item, nbt);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	private void onInteractEntity(PlayerInteractEntityEvent ev) {
 		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
 		if(handSkills!=null)
@@ -214,7 +214,7 @@ public class SkillEffectManager implements Listener {
 		getHookedSkills(ev.getPlayer()).onRightClickEntity(ev);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	private void onInteractBlock(PlayerInteractEvent ev) {
 		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
 		if(handSkills!=null)
@@ -222,7 +222,7 @@ public class SkillEffectManager implements Listener {
 		getHookedSkills(ev.getPlayer()).onRightClickBlock(ev);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	private void onDoDamage(EntityDamageByEntityEvent ev) {
 		// handle the damager
 		if (!(ev.getDamager() instanceof Player))
@@ -264,7 +264,7 @@ public class SkillEffectManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	private void onBeDamaged(EntityDamageEvent ev) {
 		if (!(ev.getEntity() instanceof Player))
 			return;
@@ -283,7 +283,7 @@ public class SkillEffectManager implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOW)
 	private void onPlayerDied(PlayerDeathEvent ev) {
 		Player p = ev.getEntity();
 		PlayerEffects pe = playereffect.get(p);
