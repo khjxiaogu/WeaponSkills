@@ -1,5 +1,7 @@
 package com.khjxiaogu.WeaponSkills;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -56,21 +58,25 @@ public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener
 					p.setItemInHand(is);
 					p.sendMessage(locale.getSkillWritten());
 				}else {
-					int lvl=Integer.parseInt(strings[2]);
 					Set<SkillDescription> descs=manager.readSkill(is);
-					if(lvl>0) {
-						SkillDescription current=new SkillDescription(strings[1],lvl);
-						descs.remove(current);
-						descs.add(current);
-						manager.writeSkill(is,descs);
-						p.setItemInHand(is);
-						p.sendMessage(locale.getSkillWritten());
-					}else {
+					if(strings[2].equals("clear")){
 						SkillDescription current=new SkillDescription(strings[1],0);
 						descs.remove(current);
 						manager.writeSkill(is,descs);
 						p.setItemInHand(is);
 						p.sendMessage(locale.getSkillRemoved());
+					}else {
+						try {
+							int lvl=Integer.parseInt(strings[2]);	
+							SkillDescription current=new SkillDescription(strings[1],lvl);
+							descs.remove(current);
+							descs.add(current);
+							manager.writeSkill(is,descs);
+							p.setItemInHand(is);
+							p.sendMessage(locale.getSkillWritten());
+						}catch(Throwable t){
+							p.sendMessage(locale.getInvalidParam());
+						}
 					}
 				}
 				return true;
@@ -127,4 +133,37 @@ public class WeaponSkills extends JavaPlugin implements CommandExecutor,Listener
 		}
 		return false;
 	}
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] strings) {
+		List<String> lstr=new ArrayList<>();
+		if(strings.length==1){
+			lstr.add("set");
+			lstr.add("clear");
+			lstr.add("read");
+			lstr.add("effect");
+			lstr.add("list");
+			return lstr;
+		}
+		if(strings.length==2) {
+			if(strings[0].equals("set")) {
+				lstr.addAll(manager.getSkillList());
+				return lstr;
+			}else if(strings[0].equals("effect")) {
+				return super.onTabComplete(sender, command, alias, strings);
+			}
+			if(strings[0].equals("list")) {
+				lstr.add("effect");
+				lstr.add("skill");
+				return lstr;
+			}
+		}
+		if(strings.length==3) {
+			if(strings[0].equals("effect")) {
+				lstr.addAll(manager.getEffectList());
+				return lstr;
+			}
+		}
+		return lstr;
+	}
+	
 }

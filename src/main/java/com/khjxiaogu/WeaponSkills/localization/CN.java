@@ -6,7 +6,7 @@ public final class CN implements LocalizationProvider {
 		// TODO Auto-generated constructor stub
 		help=new String[6];
 		help[0]=("§e武器技能插件  By khjxiaogu");
-		help[1]=("§e输入/wskill set [技能名称] [技能等级|0] 设置手中物品技能，等级为0即移除");
+		help[1]=("§e输入/wskill set [技能名称] [技能等级|clear] 设置手中物品技能，填入clear即移除");
 		help[2]=("§e输入/wskill clear 删除手中物品所有技能");
 		help[3]=("§e输入/wskill read 读取手中物品技能");
 		help[4]=("§e输入/wskill effect <玩家> <效果名称> <效果等级> <效果持续时间ms> 给玩家一个插件效果");

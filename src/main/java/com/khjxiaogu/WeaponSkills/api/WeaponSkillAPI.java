@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.khjxiaogu.WeaponSkills.CoolDownUtil;
 import com.khjxiaogu.WeaponSkills.SkillEffectManager;
+import com.khjxiaogu.WeaponSkills.Utils;
 import com.khjxiaogu.WeaponSkills.effect.EffectFactory;
 import com.khjxiaogu.WeaponSkills.effect.EffectInstance;
 import com.khjxiaogu.WeaponSkills.skill.Skill;
@@ -32,7 +33,7 @@ public class WeaponSkillAPI {
 	public static WeaponSkillAPI getAPI() {
 		return api;
 	}
-
+	
 	/**
 	 * 给予玩家指定名字的效果
 	 * add a named and registered effect to a player
@@ -232,5 +233,14 @@ public class WeaponSkillAPI {
 	 */
 	public void renewCoolDown(Player p, Skill skill, int milliSecond) {
 		CoolDownUtil.renewCoolDown(p, skill.getName(), milliSecond);
+	}
+	/**
+	 * 按照百分比随机
+	 * random under percent
+	 * @param percent 百分比，单位%，最高为100/percent,unit %,max is 100
+	 * @return 随机值是否在给定百分比之内/true if random value within the percentage
+	 */
+	public boolean randomPercent(double percent) {
+		return Utils.randomPercent(percent);
 	}
 }
