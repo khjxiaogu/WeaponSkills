@@ -56,12 +56,14 @@ public class PlayerEffects {
 		// TODO Auto-generated method stub
 		for(EffectInstance efftime:effects.values()) {
 			efftime.onDoDamage(ev);
+			if(ev.isCancelled())return;
 		}
 	}
 	public void onBeDamaged(EntityDamageEvent ev) {
 		// TODO Auto-generated method stub
 		for(EffectInstance efftime:effects.values()) {
 			efftime.onBeDamaged(ev);
+			if(ev.isCancelled())return;
 		}
 	}
 	public void onTick() {

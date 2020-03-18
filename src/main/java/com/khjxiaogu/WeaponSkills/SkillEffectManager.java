@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -225,23 +226,28 @@ public class SkillEffectManager implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	private void onDoDamage(EntityDamageByEntityEvent ev) {
 		// handle the damager
-		if (!(ev.getDamager() instanceof Player))
-			return;
-		Player p = (Player) ev.getDamager();
-		// apply effect
-		PlayerEffects pe = playereffect.get(p);
-		if (pe != null)
-			pe.onDoDamage(ev);
-		// execute skill in hand
-		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
-		if (handSkill != null)
-			handSkill.onDoDamage(ev);
-		getHookedSkills(p).onDoDamage(ev);
-		// execute skill in armor
-		for (ItemStack item : p.getEquipment().getArmorContents()) {
-			SkillInstance armorSkill = this.getSkillInstance(item);
-			if (armorSkill != null)
-				armorSkill.onDoDamage(ev);
+		if(ev.getCause()!=DamageCause.CUSTOM){
+			if (!(ev.getDamager() instanceof Player))
+				return;
+			Player p = (Player) ev.getDamager();
+			// apply effect
+			PlayerEffects pe = playereffect.get(p);
+			if (pe != null)
+				pe.onDoDamage(ev);
+			if(ev.isCancelled())return;
+			// execute skill in hand
+			SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
+			if (handSkill != null)
+				handSkill.onDoDamage(ev);
+			if(ev.isCancelled())return;
+			getHookedSkills(p).onDoDamage(ev);
+			if(ev.isCancelled())return;
+			// execute skill in armor
+			for (ItemStack item : p.getEquipment().getArmorContents()) {
+				SkillInstance armorSkill = this.getSkillInstance(item);
+				if (armorSkill != null)
+					armorSkill.onDoDamage(ev);
+			}
 		}
 		// now handle the damagee
 		if (!(ev.getEntity() instanceof Player))
@@ -251,11 +257,14 @@ public class SkillEffectManager implements Listener {
 		PlayerEffects pe2 = playereffect.get(p2);
 		if (pe2 != null)
 			pe2.onBeDamaged(ev);
+		if(ev.isCancelled())return;
 		// execute skill in hand
 		SkillInstance weaponSkill = this.getSkillInstance(p2.getItemInHand());
 		if (weaponSkill != null)
 			weaponSkill.onBeDamageByEntity(ev);
+		if(ev.isCancelled())return;
 		getHookedSkills(p2).onBeDamageByEntity(ev);
+		if(ev.isCancelled())return;
 		// execute skill in armor
 		for (ItemStack item : p2.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
@@ -266,6 +275,7 @@ public class SkillEffectManager implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	private void onBeDamaged(EntityDamageEvent ev) {
+		//if(ev instanceof EntityDamageByEntityEvent)return;
 		if (!(ev.getEntity() instanceof Player))
 			return;
 		Player p = (Player) ev.getEntity();
@@ -275,6 +285,7 @@ public class SkillEffectManager implements Listener {
 		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
 		if (handSkill != null)
 			handSkill.onBeDamaged(ev);
+		if(ev.isCancelled())return;
 		getHookedSkills(p).onBeDamaged(ev);
 		for (ItemStack item : p.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);

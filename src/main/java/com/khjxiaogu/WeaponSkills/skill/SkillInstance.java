@@ -40,6 +40,7 @@ public class SkillInstance {
 		for(int i=0;i<skills.length;i++) {
 			if(skills[i]!=null)
 				skills[i].onDoDamage(ev, levels[i]);
+			if(ev.isCancelled())break;
 		}
 	};
 	public void onRightClickEntity(PlayerInteractEntityEvent ev) {
@@ -48,6 +49,7 @@ public class SkillInstance {
 		for(int i=0;i<skills.length;i++) {
 			if(skills[i]!=null)
 				skills[i].onRightClickEntity(ev, levels[i]);
+			if(ev.isCancelled())break;
 		}
 	};
 	public void onRightClickBlock(PlayerInteractEvent ev) {
@@ -56,6 +58,7 @@ public class SkillInstance {
 		for(int i=0;i<skills.length;i++) {
 			if(skills[i]!=null)
 				skills[i].onRightClickBlock(ev, levels[i]);
+			if(ev.isCancelled())break;
 		}
 	};
 	public void onBeDamageByEntity(EntityDamageByEntityEvent ev) {
@@ -64,6 +67,7 @@ public class SkillInstance {
 		for(int i=0;i<skills.length;i++) {
 			if(skills[i]!=null)
 				skills[i].onBeDamageByEntity(ev, levels[i]);
+			if(ev.isCancelled())break;
 		}
 	};
 	public void onBeDamaged(EntityDamageEvent ev) {
@@ -72,6 +76,7 @@ public class SkillInstance {
 		for(int i=0;i<skills.length;i++) {
 			if(skills[i]!=null)
 				skills[i].onBeDamaged(ev, levels[i]);
+			if(ev.isCancelled())break;
 		}
 	};
 }
