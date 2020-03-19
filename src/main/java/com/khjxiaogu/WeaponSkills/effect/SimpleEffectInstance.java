@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import com.khjxiaogu.WeaponSkills.skill.SkillPriority;
 import com.khjxiaogu.khjxiaogu.TimeUtil;
 
 /**
@@ -63,5 +64,9 @@ public class SimpleEffectInstance implements EffectInstance{
 	public String getEffectIdentifier() {
 		// TODO Auto-generated method stub
 		return effect.getEffectIdentifier();
+	}
+	@Override
+	public SkillPriority getExecutionPriority() {
+		return effect.getExecutionPriority();
 	}
 }

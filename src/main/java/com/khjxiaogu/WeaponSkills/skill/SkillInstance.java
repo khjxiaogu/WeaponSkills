@@ -1,5 +1,6 @@
 package com.khjxiaogu.WeaponSkills.skill;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -34,11 +35,11 @@ public class SkillInstance {
 		}
 		// TODO Auto-generated constructor stub
 	}
-	public void onDoDamage(EntityDamageByEntityEvent ev) {
+	public void onDoDamage(EntityDamageByEntityEvent ev,SkillPriority pr) {
 		if(skills.length==0)
 			return;
 		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null)
+			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
 				skills[i].onDoDamage(ev, levels[i]);
 			if(ev.isCancelled())break;
 		}
@@ -61,20 +62,20 @@ public class SkillInstance {
 			if(ev.isCancelled())break;
 		}
 	};
-	public void onBeDamageByEntity(EntityDamageByEntityEvent ev) {
+	public void onBeDamageByEntity(EntityDamageByEntityEvent ev,SkillPriority pr) {
 		if(skills.length==0)
 			return;
 		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null)
+			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
 				skills[i].onBeDamageByEntity(ev, levels[i]);
 			if(ev.isCancelled())break;
 		}
 	};
-	public void onBeDamaged(EntityDamageEvent ev) {
+	public void onBeDamaged(EntityDamageEvent ev,SkillPriority pr) {
 		if(skills.length==0)
 			return;
 		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null)
+			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
 				skills[i].onBeDamaged(ev, levels[i]);
 			if(ev.isCancelled())break;
 		}

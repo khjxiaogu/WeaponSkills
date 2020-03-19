@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.khjxiaogu.WeaponSkills.WeaponSkills;
+import com.khjxiaogu.WeaponSkills.skill.SkillPriority;
 import com.khjxiaogu.khjxiaogu.TimeUtil;
 
 public class PlayerEffects {
@@ -52,18 +53,31 @@ public class PlayerEffects {
 	public void clear() {
 		effects.clear();
 	}
-	public void onDoDamage(EntityDamageByEntityEvent ev) {
+	public void onDoDamage(EntityDamageByEntityEvent ev,SkillPriority p) {
 		// TODO Auto-generated method stub
 		for(EffectInstance efftime:effects.values()) {
-			efftime.onDoDamage(ev);
-			if(ev.isCancelled())return;
+			if(efftime.getExecutionPriority()==p) {
+				efftime.onDoDamage(ev);
+				if(ev.isCancelled())return;
+			}
 		}
 	}
-	public void onBeDamaged(EntityDamageEvent ev) {
+	public void onBeDamaged(EntityDamageEvent ev,SkillPriority p) {
 		// TODO Auto-generated method stub
 		for(EffectInstance efftime:effects.values()) {
-			efftime.onBeDamaged(ev);
-			if(ev.isCancelled())return;
+			if(efftime.getExecutionPriority()==p) {
+				efftime.onBeDamaged(ev);
+				if(ev.isCancelled())return;
+			}
+		}
+	}
+	public void onBeDamagedByEntity(EntityDamageByEntityEvent ev,SkillPriority p) {
+		// TODO Auto-generated method stub
+		for(EffectInstance efftime:effects.values()) {
+			if(efftime.getExecutionPriority()==p) {
+				efftime.onBeDamagedByEntity(ev);
+				if(ev.isCancelled())return;
+			}
 		}
 	}
 	public void onTick() {

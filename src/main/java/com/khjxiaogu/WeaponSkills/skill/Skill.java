@@ -44,13 +44,21 @@ public interface Skill {
 	/**
 	 * 获取该技能的名字
 	 * returns name of this skill,must be unique
-	 * @return 效果名字 name of this skill
+	 * @return 技能名字 name of this skill
 	 */
 	public String getName();
 	/**
 	 * 获取该技能的优先级，默认0
-	 * returns name of this skill,must be unique
-	 * @return 效果名字 name of this skill
+	 * returns priority of this skill,higher priority executes first
+	 * @return 技能优先级
+	 * @deprecated 暂未有效，仍然按照技能安装顺序执行/currently,it is has not been implemented
 	 */
 	public int getPriority();
+	
+	/**
+	 * 获取该技能的伤害事件执行时间.设置为null则不执行伤害事件
+	 * returns the event execution time in bukkit of damage events,returns null indicates that this skill has no damage events
+	 * @return 执行顺序/execution order
+	 */
+	public SkillPriority getExecutionPriority();
 }

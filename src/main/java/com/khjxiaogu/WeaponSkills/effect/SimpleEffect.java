@@ -4,6 +4,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import com.khjxiaogu.WeaponSkills.skill.SkillPriority;
+
 /**
  * A simple effect with static methods. 
  * @author khjxiaogu
@@ -60,4 +62,10 @@ public interface SimpleEffect {
 	 * @return 效果名字 identifier of the effect
 	 */
 	public String getEffectIdentifier();
+	/**
+	 * 获取该技能的效果事件执行时间.设置为0则不执行
+	 * returns the event execution time in bukkit of damage events,returns null indicates that this effect has no damage events
+	 * @return 执行顺序/execution order
+	 */
+	public SkillPriority getExecutionPriority();
 }

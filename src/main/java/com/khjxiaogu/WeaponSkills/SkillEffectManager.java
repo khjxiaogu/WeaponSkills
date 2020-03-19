@@ -26,6 +26,7 @@ import com.khjxiaogu.WeaponSkills.skill.Skill;
 import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
 import com.khjxiaogu.WeaponSkills.skill.SkillHook;
 import com.khjxiaogu.WeaponSkills.skill.SkillInstance;
+import com.khjxiaogu.WeaponSkills.skill.SkillPriority;
 
 import me.dpohvar.powernbt.api.NBTCompound;
 import me.dpohvar.powernbt.api.NBTManager;
@@ -207,7 +208,7 @@ public class SkillEffectManager implements Listener {
 		nm.write(item, nbt);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onInteractEntity(PlayerInteractEntityEvent ev) {
 		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
 		if(handSkills!=null)
@@ -215,7 +216,7 @@ public class SkillEffectManager implements Listener {
 		getHookedSkills(ev.getPlayer()).onRightClickEntity(ev);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onInteractBlock(PlayerInteractEvent ev) {
 		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
 		if(handSkills!=null)
@@ -223,30 +224,39 @@ public class SkillEffectManager implements Listener {
 		getHookedSkills(ev.getPlayer()).onRightClickBlock(ev);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOWEST)
 	private void onDoDamage(EntityDamageByEntityEvent ev) {
 		// handle the damager
+		DoDamgeExecution(ev,SkillPriority.BeforeDispatch);
+	}
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onAfterDoDamage(EntityDamageByEntityEvent ev) {
+		// handle the damager
+		DoDamgeExecution(ev,SkillPriority.AfterDispatch);
+	}
+	private void DoDamgeExecution(EntityDamageByEntityEvent ev,SkillPriority pr) {
 		if(ev.getCause()!=DamageCause.CUSTOM){
-			if (!(ev.getDamager() instanceof Player))
-				return;
-			Player p = (Player) ev.getDamager();
-			// apply effect
-			PlayerEffects pe = playereffect.get(p);
-			if (pe != null)
-				pe.onDoDamage(ev);
-			if(ev.isCancelled())return;
-			// execute skill in hand
-			SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
-			if (handSkill != null)
-				handSkill.onDoDamage(ev);
-			if(ev.isCancelled())return;
-			getHookedSkills(p).onDoDamage(ev);
-			if(ev.isCancelled())return;
-			// execute skill in armor
-			for (ItemStack item : p.getEquipment().getArmorContents()) {
-				SkillInstance armorSkill = this.getSkillInstance(item);
-				if (armorSkill != null)
-					armorSkill.onDoDamage(ev);
+			if ((ev.getDamager() instanceof Player)) {
+				Player p = (Player) ev.getDamager();
+				// apply effect
+				PlayerEffects pe = playereffect.get(p);
+				if (pe != null)
+					pe.onDoDamage(ev,pr);
+				if(ev.isCancelled())return;
+				// execute skill in hand
+				SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
+				if (handSkill != null)
+					handSkill.onDoDamage(ev,pr);
+				if(ev.isCancelled())return;
+				getHookedSkills(p).onDoDamage(ev,pr);
+				if(ev.isCancelled())return;
+				// execute skill in armor
+				for (ItemStack item : p.getEquipment().getArmorContents()) {
+					SkillInstance armorSkill = this.getSkillInstance(item);
+					if (armorSkill != null)
+						armorSkill.onDoDamage(ev,pr);
+					if(ev.isCancelled())return;
+				}
 			}
 		}
 		// now handle the damagee
@@ -256,45 +266,52 @@ public class SkillEffectManager implements Listener {
 		// apply effect
 		PlayerEffects pe2 = playereffect.get(p2);
 		if (pe2 != null)
-			pe2.onBeDamaged(ev);
+			pe2.onBeDamagedByEntity(ev,pr);
 		if(ev.isCancelled())return;
 		// execute skill in hand
 		SkillInstance weaponSkill = this.getSkillInstance(p2.getItemInHand());
 		if (weaponSkill != null)
-			weaponSkill.onBeDamageByEntity(ev);
+			weaponSkill.onBeDamageByEntity(ev,pr);
 		if(ev.isCancelled())return;
-		getHookedSkills(p2).onBeDamageByEntity(ev);
+		getHookedSkills(p2).onBeDamageByEntity(ev,pr);
 		if(ev.isCancelled())return;
 		// execute skill in armor
 		for (ItemStack item : p2.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
 			if (armorSkill != null)
-				armorSkill.onBeDamageByEntity(ev);
+				armorSkill.onBeDamageByEntity(ev,pr);
+			if(ev.isCancelled())return;
 		}
 	}
-
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOWEST)
 	private void onBeDamaged(EntityDamageEvent ev) {
 		//if(ev instanceof EntityDamageByEntityEvent)return;
+		executeBeDamaged(ev,SkillPriority.BeforeDispatch);
+	}
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onAfterBeDamaged(EntityDamageEvent ev) {
+		//if(ev instanceof EntityDamageByEntityEvent)return;
+		executeBeDamaged(ev,SkillPriority.AfterDispatch);
+	}
+	private void executeBeDamaged(EntityDamageEvent ev,SkillPriority pr) {
 		if (!(ev.getEntity() instanceof Player))
 			return;
 		Player p = (Player) ev.getEntity();
 		PlayerEffects pe = playereffect.get(p);
 		if (pe != null)
-			pe.onBeDamaged(ev);
+			pe.onBeDamaged(ev,pr);
 		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
 		if (handSkill != null)
-			handSkill.onBeDamaged(ev);
+			handSkill.onBeDamaged(ev,pr);
 		if(ev.isCancelled())return;
-		getHookedSkills(p).onBeDamaged(ev);
+		getHookedSkills(p).onBeDamaged(ev,pr);
 		for (ItemStack item : p.getEquipment().getArmorContents()) {
 			SkillInstance armorSkill = this.getSkillInstance(item);
 			if (armorSkill != null)
-				armorSkill.onBeDamaged(ev);
+				armorSkill.onBeDamaged(ev,pr);
 		}
 	}
-
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onPlayerDied(PlayerDeathEvent ev) {
 		Player p = ev.getEntity();
 		PlayerEffects pe = playereffect.get(p);
