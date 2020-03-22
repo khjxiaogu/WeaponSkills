@@ -15,7 +15,7 @@ A useful library for writing plugin skills and effects without writing a lot of 
  <dependency>  
   <groupId>com.khjxiaogu</groupId>  
   <artifactId>WeaponSkills</artifactId>  
-  <version>1.3.5</version>  
+  <version>LATEST</version>  
   <scope>provided</scope>  
  </dependency>  
 ``` 
@@ -32,7 +32,7 @@ in your pom.xml
  <dependency>  
   <groupId>com.khjxiaogu</groupId>  
   <artifactId>WeaponSkills</artifactId>  
-  <version>1.3.5</version>  
+  <version>LATEST</version>  
   <scope>provided</scope>  
  </dependency>  
 ```   
