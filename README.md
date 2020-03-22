@@ -4,10 +4,10 @@ WeaponSkills plugin for minecraft.
 可以用于开发各种技能和效果的前置   
 A useful library for writing plugin skills and effects without writing a lot of checking and calculating codes  
 # How to use  
-- Download powerNBT and put into the plugins/ folder together with this plugin   
+- Download [PowerNBT](https://github.com/DPOH-VAR/PowerNBT) and put into the plugins/ folder together with this plugin   
 - Write or download extensions for this plugin and register skills and effects through apis.  
 # 用法  
-- 加入PowerNBT作为前置库   
+- 加入[PowerNBT](https://github.com/DPOH-VAR/PowerNBT)作为前置库   
 - 编写或者定制本插件的附属来提供各种各样的技能  
 # How to write extensions for this plugin 
 1. Clone and install this plugin and write  
