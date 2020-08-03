@@ -7,51 +7,46 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import com.khjxiaogu.WeaponSkills.skill.SkillPriority;
 import com.khjxiaogu.khjxiaogu.TimeUtil;
 
-/**
- * 简单技能的实例，用于储存技能信息
- * instance of simple effects,for store effect details.
- * @author khjxiaogu
- * @time 2020年2月18日
- * file:SimpleEffectInstance.java
- */
-public class SimpleEffectInstance implements EffectInstance{
-	private SimpleEffect effect;
+public class DataOwnedEffectInstance implements EffectInstance {
+	private DataOwnedEffect effect;
+	private int time;
 	private long expires;
-	private int level;
-	private Player owner;
-	public SimpleEffectInstance(Player p,SimpleEffect e,int time,int level) {
+	public DataOwnedEffectInstance(Player p,Class<DataOwnedEffect> e,int time,int level)throws Exception{
 		expires=TimeUtil.getTime()+time;
-		effect=e;
-		owner=p;
-		this.level=level;
-		effect.onEffectGiven(p, time, level);
+		effect=e.getConstructor().newInstance();
+		effect.initEffect(p, time, level);
 		// TODO Auto-generated constructor stub
 	}
-	public SimpleEffect getEffect() {
-		return effect;
+	public int getTime() {
+		return time;
 	}
+	@Override
 	public long getExpireTime() {
 		return expires;
 	}
+	@Override
 	public void onDoDamage(EntityDamageByEntityEvent ev) {
 		// TODO Auto-generated method stub
-		effect.onDoDamage(ev, level);
+		effect.onDoDamage(ev);
 	}
 	@Override
 	public void onBeDamagedByEntity(EntityDamageByEntityEvent ev) {
 		// TODO Auto-generated method stub
-		effect.onBeDamagedByEntity(ev, level);
+		effect.onBeDamagedByEntity(ev);
 	}
+	@Override
 	public void onBeDamaged(EntityDamageEvent ev) {
 		// TODO Auto-generated method stub
-		effect.onBeDamaged(ev, level);
+		effect.onBeDamaged(ev);
 	}
+	@Override
 	public void onTick() {
 		// TODO Auto-generated method stub
-		effect.onTick(owner, level);
+		effect.onTick();
 	}
+	@Override
 	public void onRemove(boolean timeout) {
-		effect.onEnd(owner,timeout, level);
+		effect.onEnd(timeout);
 	}
 	@Override
 	public String getEffectIdentifier() {

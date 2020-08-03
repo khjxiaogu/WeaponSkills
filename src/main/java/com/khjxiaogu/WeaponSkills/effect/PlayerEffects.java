@@ -33,8 +33,8 @@ public class PlayerEffects {
 		long time=TimeUtil.getTime();
 		for(Map.Entry<EffectFactory, EffectInstance> efftime:effects.entrySet()) {
 			if(efftime.getValue().getExpireTime()<time) {
-				efftime.getValue().onRemove();
 				effects.remove(efftime.getKey());
+				efftime.getValue().onRemove(true);
 			}else
 				new BukkitRunnable() {
 					EffectInstance efftime;
@@ -51,6 +51,9 @@ public class PlayerEffects {
 
 	}
 	public void clear() {
+		for(EffectInstance ei:effects.values()) {
+			ei.onRemove(false);
+		}
 		effects.clear();
 	}
 	public void onDoDamage(EntityDamageByEntityEvent ev,SkillPriority p) {
