@@ -11,7 +11,7 @@ public class DataOwnedEffectInstance implements EffectInstance {
 	private DataOwnedEffect effect;
 	private int time;
 	private long expires;
-	public DataOwnedEffectInstance(Player p,Class<DataOwnedEffect> e,int time,int level)throws Exception{
+	public DataOwnedEffectInstance(Player p,Class<? extends DataOwnedEffect> e,int time,int level)throws Exception{
 		expires=TimeUtil.getTime()+time;
 		effect=e.getConstructor().newInstance();
 		effect.initEffect(p, time, level);

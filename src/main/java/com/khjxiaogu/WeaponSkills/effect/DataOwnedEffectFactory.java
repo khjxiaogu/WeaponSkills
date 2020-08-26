@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 import com.khjxiaogu.WeaponSkills.api.WeaponSkillAPI;
 
 public class DataOwnedEffectFactory implements EffectFactory {
-	private Class<DataOwnedEffect> eff;
+	private Class<? extends DataOwnedEffect> eff;
 	private String id;
-	public DataOwnedEffectFactory(Class<DataOwnedEffect> e)throws Exception {
+	public DataOwnedEffectFactory(Class<? extends DataOwnedEffect> e)throws Exception {
 		// TODO Auto-generated constructor stub
 		id=e.getConstructor().newInstance().getEffectIdentifier();
 		eff=e;
