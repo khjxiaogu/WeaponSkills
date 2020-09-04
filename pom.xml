@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.khjxiaogu</groupId>
   <artifactId>WeaponSkills</artifactId>
-  <version>1.4.3</version>
+  <version>1.4.4</version>
   <name>[前置]武器技能库</name>
           <build>
         <finalName>${project.name}v${project.version}</finalName>
