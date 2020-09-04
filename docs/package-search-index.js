@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"com.khjxiaogu.WeaponSkills.api"},{"l":"所有程序包","url":"allpackages-index.html"}]
+packageSearchIndex = [{"l":"com.khjxiaogu.khjxiaogu"},{"l":"com.khjxiaogu.WeaponSkills"},{"l":"com.khjxiaogu.WeaponSkills.api"},{"l":"com.khjxiaogu.WeaponSkills.effect"},{"l":"com.khjxiaogu.WeaponSkills.localization"},{"l":"com.khjxiaogu.WeaponSkills.skill"},{"l":"所有程序包","url":"allpackages-index.html"}]

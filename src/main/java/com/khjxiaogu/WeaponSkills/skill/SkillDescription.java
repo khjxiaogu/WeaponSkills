@@ -12,10 +12,11 @@ public class SkillDescription {
 	Skill skill;
 	int level;
 	/**
-	 * 为输出使用
+	 * 记录并使用技能时用的构造器，内部使用
+	 * 如需产生技能描述符，请使用{@link SkillDescription#SkillDescription(String,int) SkillDescription(String,int)}
 	 * for output
 	 * @param n skill name
-	 * @param s skill instance
+	 * @param s 技能
 	 * @param l level
 	 */
 	public SkillDescription(String n,Skill s,int l) {
@@ -25,7 +26,7 @@ public class SkillDescription {
 		// TODO Auto-generated constructor stub
 	}
 	/**
-	 * 为给物品设置技能使用
+	 * 设置技能使用
 	 * for setting skill for item
 	 * @param n 技能名字 skill name
 	 * @param l 技能等级 skill level
