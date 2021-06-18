@@ -1,19 +1,21 @@
 package com.khjxiaogu.WeaponSkills;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,6 +24,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.khjxiaogu.WeaponSkills.effect.EffectFactory;
 import com.khjxiaogu.WeaponSkills.effect.EffectInstance;
 import com.khjxiaogu.WeaponSkills.effect.PlayerEffects;
+import com.khjxiaogu.WeaponSkills.events.PlayerBeDamageEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerClickEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerDamagedEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerDoDamageEvent;
 import com.khjxiaogu.WeaponSkills.skill.Skill;
 import com.khjxiaogu.WeaponSkills.skill.SkillDescription;
 import com.khjxiaogu.WeaponSkills.skill.SkillHook;
@@ -38,6 +44,7 @@ public class SkillEffectManager implements Listener {
 	private Map<String, Skill> skills = new ConcurrentHashMap<>();
 	private NBTManager nm = NBTManager.getInstance();
 	private Map<String, SkillHook> skillhooks = new ConcurrentHashMap<>();
+
 	private SkillEffectManager() {
 		new BukkitRunnable() {
 			@Override
@@ -45,18 +52,21 @@ public class SkillEffectManager implements Listener {
 				if (playereffect.isEmpty())
 					return;
 				for (PlayerEffects eff : playereffect.values()) {
-							eff.onTick();
+					eff.onTick();
 				}
 			}
 		}.runTaskTimerAsynchronously(WeaponSkills.plugin, 100, 5);
 		// TODO Auto-generated constructor stub
 	}
+
 	public Skill getSkillByName(String s) {
 		return skills.get(s);
 	}
+
 	public EffectFactory getEffectByName(String s) {
 		return effects.get(s);
 	}
+
 	public boolean giveEffect(Player p, String name, int time, int level) {
 		PlayerEffects current = playereffect.get(p);
 		if (current == null) {
@@ -64,10 +74,10 @@ public class SkillEffectManager implements Listener {
 			playereffect.put(p, current);
 		}
 		EffectFactory e = effects.get(name);
-		if (e != null)
+		if (e != null) {
 			current.giveEffect(e, time, level);
-		else {
-			WeaponSkills.plugin.getLogger().warning(name +WeaponSkills.plugin.locale.getEffectInvalid());
+		} else {
+			WeaponSkills.plugin.getLogger().warning(name + WeaponSkills.plugin.locale.getEffectInvalid());
 			return false;
 		}
 		return true;
@@ -79,75 +89,80 @@ public class SkillEffectManager implements Listener {
 			current = new PlayerEffects(p);
 			playereffect.put(p, current);
 		}
-		if (e != null)
+		if (e != null) {
 			current.giveEffect(e, time, level);
-		else {
+		} else
 			return false;
-		}
 		return true;
 	}
-	public EffectInstance getEffect(Player p,EffectFactory effect) {
+
+	public EffectInstance getEffect(Player p, EffectFactory effect) {
 		PlayerEffects current = playereffect.get(p);
-		if (current != null) {
+		if (current != null)
 			return current.getEffect(effect);
-		}
 		return null;
 	}
-	public EffectInstance getEffect(Player p,String name) {
+
+	public EffectInstance getEffect(Player p, String name) {
 		PlayerEffects current = playereffect.get(p);
 		EffectFactory e = effects.get(name);
 		if (e == null)
 			return null;
-		if (current != null) {
+		if (current != null)
 			return current.getEffect(e);
-		}
 		return null;
 	}
-	public boolean hasEffect(Player p,EffectFactory effect) {
+
+	public boolean hasEffect(Player p, EffectFactory effect) {
 		PlayerEffects current = playereffect.get(p);
-		if (current != null) {
+		if (current != null)
 			return current.hasEffect(effect);
-		}
 		return false;
 	}
-	public boolean hasEffect(Player p,String name) {
+
+	public boolean hasEffect(Player p, String name) {
 		PlayerEffects current = playereffect.get(p);
 		EffectFactory e = effects.get(name);
 		if (e == null)
 			return false;
-		if (current != null) {
+		if (current != null)
 			return current.hasEffect(e);
-		}
 		return false;
 	}
-	public void writeSkill(ItemStack item,Set<SkillDescription> skills) {
+
+	public void writeSkill(ItemStack item, Set<SkillDescription> skills) {
 		NBTCompound nbt = nm.read(item);
-		if (nbt == null)
+		if (nbt == null) {
 			nbt = new NBTCompound();
-		NBTCompound pnbt = nbt.getCompound("SkillEffects");
-		if (pnbt == null)
-			pnbt = new NBTCompound();
-		String skillstr="";
-		String levelstr="";
-		for(SkillDescription skill:skills) {
-			skillstr+=skill.getName();
-			levelstr+=skill.getLevel();
-			skillstr+=",";
-			levelstr+=",";
 		}
-		pnbt.put("Skill",skillstr);
-		pnbt.put("Skilllevel",levelstr);
+		NBTCompound pnbt = nbt.getCompound("SkillEffects");
+		if (pnbt == null) {
+			pnbt = new NBTCompound();
+		}
+		String skillstr = "";
+		String levelstr = "";
+		for (SkillDescription skill : skills) {
+			skillstr += skill.getName();
+			levelstr += skill.getLevel();
+			skillstr += ",";
+			levelstr += ",";
+		}
+		pnbt.put("Skill", skillstr);
+		pnbt.put("Skilllevel", levelstr);
 		nbt.put("SkillEffects", pnbt);
 		nm.write(item, nbt);
 	}
-	public void RegisterSkillHook(String name,SkillHook hook) {
-		skillhooks.put(name,hook);
+
+	public void RegisterSkillHook(String name, SkillHook hook) {
+		skillhooks.put(name, hook);
 	}
+
 	public void UnregisterSkillHook(String name) {
 		skillhooks.remove(name);
 	}
+
 	public Set<SkillDescription> readSkill(ItemStack item) {
-		Set<SkillDescription> ret=new HashSet<>();
+		Set<SkillDescription> ret = new HashSet<>();
 		NBTCompound nbt = nm.read(item);
 		if (nbt == null)
 			return ret;
@@ -156,28 +171,31 @@ public class SkillEffectManager implements Listener {
 			return ret;
 		String Skills = pnbt.getString("Skill");
 		String levels = pnbt.getString("Skilllevel");
-		String[] sks=Skills.split(",");
-		String[] lvs=levels.split(",");
-		
-		for(int i=0;i<sks.length;i++) {
-			ret.add(new SkillDescription(sks[i], skills.get(sks[i]),Integer.parseInt(lvs[i])));
+		String[] sks = Skills.split(",");
+		String[] lvs = levels.split(",");
+
+		for (int i = 0; i < sks.length; i++) {
+			ret.add(new SkillDescription(sks[i], skills.get(sks[i]), Integer.parseInt(lvs[i])));
 		}
 		return ret;
 	}
+
 	public SkillInstance getHookedSkills(Player p) {
-		Set<SkillDescription> skills=new HashSet<>();
-		for(SkillHook hook:skillhooks.values()) {
+		Set<SkillDescription> skills = new HashSet<>();
+		for (SkillHook hook : skillhooks.values()) {
 			try {
 				skills.addAll(hook.getSkill(p));
-			}catch(Exception e) {
+			} catch (Exception e) {
 				try {
-					WeaponSkills.plugin.getLogger().warning("从"+hook.getName()+"载入技能失败!");
-				}catch(Exception f) {}
+					WeaponSkills.plugin.getLogger().warning("从" + hook.getName() + "载入技能失败!");
+				} catch (Exception f) {
+				}
 				e.printStackTrace();
 			}
 		}
 		return new SkillInstance(skills);
 	}
+
 	public SkillInstance getSkillInstance(ItemStack item) {
 		if (item == null || item.getType() == Material.AIR)
 			return null;
@@ -189,134 +207,184 @@ public class SkillEffectManager implements Listener {
 			return null;
 		String Skills = pnbt.getString("Skill");
 		String levels = pnbt.getString("Skilllevel");
-		String[] sks=Skills.split(",");
-		String[] lvs=levels.split(",");
-		Skill[] skns=new Skill[sks.length];
-		int[] lvns=new int[sks.length];
-		for(int i=0;i<sks.length;i++) {
-			skns[i]=skills.get(sks[i]);
-			lvns[i]=Integer.parseInt(lvs[i]);
+		String[] sks = Skills.split(",");
+		String[] lvs = levels.split(",");
+		Skill[] skns = new Skill[sks.length];
+		int[] lvns = new int[sks.length];
+		for (int i = 0; i < sks.length; i++) {
+			skns[i] = skills.get(sks[i]);
+			lvns[i] = Integer.parseInt(lvs[i]);
 		}
-		return new SkillInstance(skns,lvns);
+		return new SkillInstance(skns, lvns);
 	}
 
 	public void removeSkill(ItemStack item) {
 		NBTCompound nbt = nm.read(item);
-		if (nbt == null)
+		if (nbt == null) {
 			nbt = new NBTCompound();
+		}
 		nbt.remove("SkillEffects");
 		nm.write(item, nbt);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onInteractEntity(PlayerInteractEntityEvent ev) {
-		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
-		if(handSkills!=null)
-			handSkills.onRightClickEntity(ev);
-		getHookedSkills(ev.getPlayer()).onRightClickEntity(ev);
+		SkillInstance handSkills = getSkillInstance(ev.getPlayer().getItemInHand());
+		if (handSkills != null) {
+			handSkills.onRightClick(new PlayerClickEvent(ev));
+		}
+		getHookedSkills(ev.getPlayer()).onRightClick(new PlayerClickEvent(ev));
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onInteractBlock(PlayerInteractEvent ev) {
-		SkillInstance handSkills = this.getSkillInstance(ev.getPlayer().getItemInHand());
-		if(handSkills!=null)
-			handSkills.onRightClickBlock(ev);
-		getHookedSkills(ev.getPlayer()).onRightClickBlock(ev);
+		if (ev.getAction() == Action.RIGHT_CLICK_BLOCK || ev.getAction() == Action.RIGHT_CLICK_AIR) {
+			SkillInstance handSkills = getSkillInstance(ev.getPlayer().getItemInHand());
+			if (handSkills != null) {
+				handSkills.onRightClick(new PlayerClickEvent(ev));
+			}
+			getHookedSkills(ev.getPlayer()).onRightClick(new PlayerClickEvent(ev));
+		}
 	}
-
+	static class PlayerDoDamageBuffer{
+		
+	}
+	Map<EntityDamageByEntityEvent,PlayerDoDamageBuffer> cache=new HashMap<>();
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onDoDamage(EntityDamageByEntityEvent ev) {
 		// handle the damager
-		DoDamgeExecution(ev,SkillPriority.BeforeDispatch);
+		DoDamageEvent(ev, SkillPriority.BeforeDispatch);
 	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onAfterDoDamage(EntityDamageByEntityEvent ev) {
 		// handle the damager
-		DoDamgeExecution(ev,SkillPriority.AfterDispatch);
+		DoDamageEvent(ev, SkillPriority.AfterDispatch);
 	}
-	private void DoDamgeExecution(EntityDamageByEntityEvent ev,SkillPriority pr) {
-		if(ev.getCause()!=DamageCause.CUSTOM){
-			if ((ev.getDamager() instanceof Player)) {
-				Player p = (Player) ev.getDamager();
-				// apply effect
-				PlayerEffects pe = playereffect.get(p);
-				if (pe != null)
-					pe.onDoDamage(ev,pr);
-				if(ev.isCancelled())return;
-				// execute skill in hand
-				SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
-				if (handSkill != null)
-					handSkill.onDoDamage(ev,pr);
-				if(ev.isCancelled())return;
-				getHookedSkills(p).onDoDamage(ev,pr);
-				if(ev.isCancelled())return;
-				// execute skill in armor
-				for (ItemStack item : p.getEquipment().getArmorContents()) {
-					SkillInstance armorSkill = this.getSkillInstance(item);
-					if (armorSkill != null)
-						armorSkill.onDoDamage(ev,pr);
-					if(ev.isCancelled())return;
+
+	private void DoDamageEvent(EntityDamageByEntityEvent ev, SkillPriority pr) {
+		if (ev.getDamager() instanceof Player) {
+			if (ev.getEntity() instanceof LivingEntity) {
+				DoDamageExecution(new PlayerDoDamageEvent(ev), pr);
+				if (ev.getEntity() instanceof Player) {
+					BeDamageExecution(new PlayerBeDamageEvent(ev), pr);
 				}
 			}
 		}
-		// now handle the damagee
-		if (!(ev.getEntity() instanceof Player))
-			return;
-		Player p2 = (Player) ev.getEntity();
-		// apply effect
-		PlayerEffects pe2 = playereffect.get(p2);
-		if (pe2 != null)
-			pe2.onBeDamagedByEntity(ev,pr);
-		if(ev.isCancelled())return;
-		// execute skill in hand
-		SkillInstance weaponSkill = this.getSkillInstance(p2.getItemInHand());
-		if (weaponSkill != null)
-			weaponSkill.onBeDamageByEntity(ev,pr);
-		if(ev.isCancelled())return;
-		getHookedSkills(p2).onBeDamageByEntity(ev,pr);
-		if(ev.isCancelled())return;
-		// execute skill in armor
-		for (ItemStack item : p2.getEquipment().getArmorContents()) {
-			SkillInstance armorSkill = this.getSkillInstance(item);
-			if (armorSkill != null)
-				armorSkill.onBeDamageByEntity(ev,pr);
-			if(ev.isCancelled())return;
+		if (ev.getDamager() instanceof LivingEntity && ev.getEntity() instanceof Player) {
+			BeDamageExecution(new PlayerBeDamageEvent(ev), pr);
 		}
 	}
+
+	private void DoDamageExecution(PlayerDoDamageEvent ev, SkillPriority pr) {
+		Player p = ev.getSource();
+		// apply effect
+		PlayerEffects pe = playereffect.get(p);
+		if (pe != null) {
+			pe.onDoDamage(ev, pr);
+		}
+		if (ev.isCancelled())
+			return;
+		// execute skill in hand
+		SkillInstance handSkill = getSkillInstance(p.getItemInHand());
+		if (handSkill != null) {
+			handSkill.onDoDamage(ev, pr);
+		}
+		if (ev.isCancelled())
+			return;
+		getHookedSkills(p).onDoDamage(ev, pr);
+		if (ev.isCancelled())
+			return;
+		// execute skill in armor
+		for (ItemStack item : p.getEquipment().getArmorContents()) {
+			SkillInstance armorSkill = getSkillInstance(item);
+			if (armorSkill != null) {
+				armorSkill.onDoDamage(ev, pr);
+			}
+			if (ev.isCancelled())
+				return;
+		}
+	}
+
+	private void BeDamageExecution(PlayerBeDamageEvent ev, SkillPriority pr) {
+		Player p = ev.getTarget();
+		// apply effect
+		PlayerEffects pe = playereffect.get(p);
+		if (pe != null) {
+			pe.onBeDamagedByEntity(ev, pr);
+		}
+		if (ev.isCancelled())
+			return;
+		// execute skill in hand
+		SkillInstance weaponSkill = getSkillInstance(p.getItemInHand());
+		if (weaponSkill != null) {
+			weaponSkill.onBeDamageByEntity(ev, pr);
+		}
+		if (ev.isCancelled())
+			return;
+		getHookedSkills(p).onBeDamageByEntity(ev, pr);
+		if (ev.isCancelled())
+			return;
+		// execute skill in armor
+		for (ItemStack item : p.getEquipment().getArmorContents()) {
+			SkillInstance armorSkill = getSkillInstance(item);
+			if (armorSkill != null) {
+				armorSkill.onBeDamageByEntity(ev, pr);
+			}
+			if (ev.isCancelled())
+				return;
+		}
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onBeDamaged(EntityDamageEvent ev) {
-		//if(ev instanceof EntityDamageByEntityEvent)return;
-		executeBeDamaged(ev,SkillPriority.BeforeDispatch);
+		// if(ev instanceof EntityDamageByEntityEvent)return;
+		executeBeDamaged(ev, SkillPriority.BeforeDispatch);
 	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onAfterBeDamaged(EntityDamageEvent ev) {
-		//if(ev instanceof EntityDamageByEntityEvent)return;
-		executeBeDamaged(ev,SkillPriority.AfterDispatch);
+		// if(ev instanceof EntityDamageByEntityEvent)return;
+		executeBeDamaged(ev, SkillPriority.AfterDispatch);
 	}
-	private void executeBeDamaged(EntityDamageEvent ev,SkillPriority pr) {
-		if (!(ev.getEntity() instanceof Player))
-			return;
-		Player p = (Player) ev.getEntity();
-		PlayerEffects pe = playereffect.get(p);
-		if (pe != null)
-			pe.onBeDamaged(ev,pr);
-		SkillInstance handSkill = this.getSkillInstance(p.getItemInHand());
-		if (handSkill != null)
-			handSkill.onBeDamaged(ev,pr);
-		if(ev.isCancelled())return;
-		getHookedSkills(p).onBeDamaged(ev,pr);
-		for (ItemStack item : p.getEquipment().getArmorContents()) {
-			SkillInstance armorSkill = this.getSkillInstance(item);
-			if (armorSkill != null)
-				armorSkill.onBeDamaged(ev,pr);
+
+	private void executeBeDamaged(EntityDamageEvent ev, SkillPriority pr) {
+		if (ev.getEntity() instanceof Player) {
+			DoBeDamaged(new PlayerDamagedEvent(ev), pr);
 		}
 	}
+
+	private void DoBeDamaged(PlayerDamagedEvent ev, SkillPriority pr) {
+		Player p = ev.getTarget();
+
+		PlayerEffects pe = playereffect.get(p);
+		if (pe != null) {
+			pe.onBeDamaged(ev, pr);
+		}
+		SkillInstance handSkill = getSkillInstance(p.getItemInHand());
+		if (handSkill != null) {
+			handSkill.onBeDamaged(ev, pr);
+		}
+		if (ev.isCancelled())
+			return;
+		getHookedSkills(p).onBeDamaged(ev, pr);
+		for (ItemStack item : p.getEquipment().getArmorContents()) {
+			SkillInstance armorSkill = getSkillInstance(item);
+			if (armorSkill != null) {
+				armorSkill.onBeDamaged(ev, pr);
+			}
+			if (ev.isCancelled())
+				return;
+		}
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onPlayerDied(PlayerDeathEvent ev) {
 		Player p = ev.getEntity();
 		PlayerEffects pe = playereffect.get(p);
-		if (pe != null)
+		if (pe != null) {
 			pe.clear();
+		}
 	}
 
 	public void defineEffect(String name, EffectFactory eff) {
@@ -336,7 +404,7 @@ public class SkillEffectManager implements Listener {
 	}
 
 	public static SkillEffectManager getManager() {
-		return manager;
+		return SkillEffectManager.manager;
 	}
 
 	public Set<String> getEffectList() {

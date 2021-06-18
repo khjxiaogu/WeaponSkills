@@ -2,15 +2,16 @@ package com.khjxiaogu.WeaponSkills.localization;
 
 public class EN implements LocalizationProvider {
 	public String[] help;
+
 	public EN() {
 		// TODO Auto-generated constructor stub
-		help=new String[6];
-		help[0]=(Messages.getString("EN.0")); //$NON-NLS-1$
-		help[1]=(Messages.getString("EN.1")); //$NON-NLS-1$
-		help[2]=(Messages.getString("EN.2")); //$NON-NLS-1$
-		help[3]=(Messages.getString("EN.3")); //$NON-NLS-1$
-		help[4]=(Messages.getString("EN.4")); //$NON-NLS-1$
-		help[5]=(Messages.getString("EN.5")); //$NON-NLS-1$
+		help = new String[6];
+		help[0] = Messages.getString("EN.0"); //$NON-NLS-1$
+		help[1] = Messages.getString("EN.1"); //$NON-NLS-1$
+		help[2] = Messages.getString("EN.2"); //$NON-NLS-1$
+		help[3] = Messages.getString("EN.3"); //$NON-NLS-1$
+		help[4] = Messages.getString("EN.4"); //$NON-NLS-1$
+		help[5] = Messages.getString("EN.5"); //$NON-NLS-1$
 		// TODO Auto-generated constructor stub
 	}
 
@@ -96,6 +97,11 @@ public class EN implements LocalizationProvider {
 	public String getListOfEffect() {
 		// TODO Auto-generated method stub
 		return Messages.getString("EN.18"); //$NON-NLS-1$
+	}
+
+	@Override
+	public String getCurrentListOfSkill() {
+		return "§eeffective skill list:";
 	}
 
 }

@@ -30,4 +30,5 @@ public interface LocalizationProvider {
 
 	String getListOfEffect();
 
+	String getCurrentListOfSkill();
 }

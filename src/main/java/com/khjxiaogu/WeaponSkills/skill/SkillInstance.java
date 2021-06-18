@@ -1,83 +1,103 @@
 package com.khjxiaogu.WeaponSkills.skill;
 
-import java.util.Arrays;
+import java.util.AbstractList;
+import java.util.List;
 import java.util.Set;
 
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-
 import com.khjxiaogu.WeaponSkills.SkillEffectManager;
+import com.khjxiaogu.WeaponSkills.events.PlayerBeDamageEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerClickEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerDamagedEvent;
+import com.khjxiaogu.WeaponSkills.events.PlayerDoDamageEvent;
 
-public class SkillInstance {
+public class SkillInstance extends AbstractList<SkillDescription>{
 	Skill[] skills;
 	int[] levels;
-	public SkillInstance(Skill[] skills,int[] levels) {
-		this.skills=skills;
-		this.levels=levels;
+
+	public SkillInstance(Skill[] skills, int[] levels) {
+		this.skills = skills;
+		this.levels = levels;
 		// TODO Auto-generated constructor stub
 	}
+
 	public SkillInstance(Set<SkillDescription> skillset) {
-		int size=skillset.size();
-		skills=new Skill[size];
-		levels=new int[size];
-		if(size==0)
+		int size = skillset.size();
+		skills = new Skill[size];
+		levels = new int[size];
+		if (size == 0)
 			return;
-		int i=0;
-		for(SkillDescription skill:skillset) {
-			if(skill.skill!=null)
-				skills[i]=skill.skill;
-			else
-				skills[i]=SkillEffectManager.getManager().getSkillByName(skill.name);
-			levels[i]=skill.level;
+		int i = 0;
+		for (SkillDescription skill : skillset) {
+			if (skill.skill != null) {
+				skills[i] = skill.skill;
+			} else {
+				skills[i] = SkillEffectManager.getManager().getSkillByName(skill.name);
+			}
+			levels[i] = skill.level;
 			i++;
 		}
 		// TODO Auto-generated constructor stub
 	}
-	public void onDoDamage(EntityDamageByEntityEvent ev,SkillPriority pr) {
-		if(skills.length==0)
+
+	public void onDoDamage(PlayerDoDamageEvent ev, SkillPriority pr) {
+		if (skills.length == 0)
 			return;
-		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
+		for (int i = 0; i < skills.length; i++) {
+			if (skills[i] != null && skills[i].getExecutionPriority() == pr) {
 				skills[i].onDoDamage(ev, levels[i]);
-			if(ev.isCancelled())break;
+			}
+			if (ev.isCancelled()) {
+				break;
+			}
 		}
 	};
-	public void onRightClickEntity(PlayerInteractEntityEvent ev) {
-		if(skills.length==0)
+
+	public void onRightClick(PlayerClickEvent ev) {
+		if (skills.length == 0)
 			return;
-		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null)
-				skills[i].onRightClickEntity(ev, levels[i]);
-			if(ev.isCancelled())break;
+		for (int i = 0; i < skills.length; i++) {
+			if (skills[i] != null) {
+				skills[i].onRightClick(ev, levels[i]);
+			}
+			if (ev.isCancelled()) {
+				break;
+			}
 		}
 	};
-	public void onRightClickBlock(PlayerInteractEvent ev) {
-		if(skills.length==0)
+
+	public void onBeDamageByEntity(PlayerBeDamageEvent ev, SkillPriority pr) {
+		if (skills.length == 0)
 			return;
-		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null)
-				skills[i].onRightClickBlock(ev, levels[i]);
-			if(ev.isCancelled())break;
-		}
-	};
-	public void onBeDamageByEntity(EntityDamageByEntityEvent ev,SkillPriority pr) {
-		if(skills.length==0)
-			return;
-		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
+		for (int i = 0; i < skills.length; i++) {
+			if (skills[i] != null && skills[i].getExecutionPriority() == pr) {
 				skills[i].onBeDamageByEntity(ev, levels[i]);
-			if(ev.isCancelled())break;
+			}
+			if (ev.isCancelled()) {
+				break;
+			}
 		}
 	};
-	public void onBeDamaged(EntityDamageEvent ev,SkillPriority pr) {
-		if(skills.length==0)
+
+	public void onBeDamaged(PlayerDamagedEvent ev, SkillPriority pr) {
+		if (skills.length == 0)
 			return;
-		for(int i=0;i<skills.length;i++) {
-			if(skills[i]!=null&&skills[i].getExecutionPriority()==pr)
+		for (int i = 0; i < skills.length; i++) {
+			if (skills[i] != null && skills[i].getExecutionPriority() == pr) {
 				skills[i].onBeDamaged(ev, levels[i]);
-			if(ev.isCancelled())break;
+			}
+			if (ev.isCancelled()) {
+				break;
+			}
 		}
+	}
+
+	@Override
+	public SkillDescription get(int i) {
+		return new SkillDescription(skills[i].getName(),skills[i],levels[i]);
+	}
+
+	@Override
+	public int size() {
+		return skills.length;
 	};
 }
